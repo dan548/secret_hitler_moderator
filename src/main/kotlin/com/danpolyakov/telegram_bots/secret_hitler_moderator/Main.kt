@@ -11,12 +11,11 @@ fun main() {
 
         token = "926152253:AAEZc96FuDs7MsmV8iBK3sFx3eEbFgi8JZ8"
         dispatch {
-            text { bot, update ->
-                val text = update.message?.text ?: "Hello, World!"
-                bot.sendMessage(chatId = update.message!!.chat.id, text = text)
+            text("Слава") { bot, update ->
+                bot.sendMessage(chatId = update.message!!.chat.id, text = "Украине!")
             }
             command("greet") { bot, update ->
-                val firstName = update.message!!.forwardFrom?.firstName
+                val firstName = update.message!!.from?.firstName
                 bot.sendMessage(chatId = update.message!!.chat.id, text = "$firstName Украине!")
             }
         }
