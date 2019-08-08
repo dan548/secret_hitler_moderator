@@ -7,9 +7,9 @@ enum class Symbols(private val str : String, val description : String) {
     POLICY_PEEK("\uD83D\uDD2E", "Presidential Power: Policy Peek"),
     INVEST("\uD83D\uDD0D", "Presidential Power: Investigate Loyalty"),
     EXECUTE("\uD83D\uDDE1", "Presidential Power: Execution"),
-    SPECIAL_ELECTION("\uD83C\uDCA1", "Presidential Power: Call Special Election"),
+    SPECIAL_ELECTION("\ud83e\udd80", "Presidential Power: Call Special Election"),
     LIB_WIN("\uD83D\uDD4A", "Liberals win"),
-    FASC_WIN("\uD83D\uDD71", "Fascists win");
+    FASC_WIN("\u2600", "Fascists win");
 
 
     fun getString() : String {
