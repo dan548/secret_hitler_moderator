@@ -28,7 +28,7 @@ enum class Symbols(private val hexStr : String, val description : String) {
         } else {
             val byteArray = ByteArray((hexString.length + 1) / 2)
             val hexStringWithNulls = "0$hexString"
-            for (i in 0..hexStringWithNulls.length / 2) {
+            for (i in 0..hexString.length / 2) {
                 val substr = hexStringWithNulls.substring(2*i, 2*(i+1))
                 byteArray[i] = hexToByte(substr)
             }
