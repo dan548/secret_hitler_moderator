@@ -5,6 +5,7 @@ import me.ivmg.telegram.bot
 import me.ivmg.telegram.dispatch
 import me.ivmg.telegram.dispatcher.command
 import me.ivmg.telegram.entities.InlineKeyboardButton
+import com.natpryce.konfig.*
 
 fun main() {
 
@@ -20,9 +21,12 @@ fun main() {
             |/help - Предоставление информации о доступных командах
             |/start - Показать сообщение и список команд""".trimMargin()
 
+    val key = Key("bot.api-key", stringType)
+    val config = ConfigurationProperties.fromResource("app.properties")
+
     val bot = bot {
 
-        token = "926152253:AAEZc96FuDs7MsmV8iBK3sFx3eEbFgi8JZ8"
+        token = config[key]
         dispatch {
             command("help") { bot, update ->
                 bot.sendMessage(chatId = update.message!!.chat.id, text = commands)
@@ -84,10 +88,19 @@ fun main() {
                             if (userStatus == "administrator" || userStatus == "creator" || userId == game!!.initiatorId) {
                                 if (game!!.playerList.size >= 5 && game.playerList.size <= 10) {
                                     game.start()
+                                    bot.sendMessage(chatId, "The game has started.")
+                                    game.informPlayers(bot)
+                                } else {
+                                    bot.sendMessage(chatId, "Bad player number.")
                                 }
+                            } else {
+                                bot.sendMessage(chatId,
+                                    "${game.playerList[userId]!!.name}, you have no rights to start the game.")
                             }
                         }
                     }
+                } else {
+                    bot.sendMessage(chatId, "There are no games in this chat.")
                 }
             }
             command("join") { bot, update ->
@@ -119,7 +132,7 @@ fun main() {
                 val chatId = update.message!!.chat.id
                 val builder = StringBuilder("The following symbols can appear on the board:")
                 for (symbol in Symbols.values()) {
-                    builder.append('\n').append(symbol.getString()).append(symbol.description)
+                    builder.append('\n').append(symbol).append(symbol.description)
                 }
                 bot.sendMessage(chatId = chatId, text = builder.toString())
             }
@@ -130,6 +143,10 @@ fun main() {
         }
     }
     bot.startPolling()
+}
+
+fun startRound() {
+
 }
 
 fun endGame(bot : Bot, game : Game, endCode : Int) {
@@ -144,3 +161,4 @@ fun endGame(bot : Bot, game : Game, endCode : Int) {
     */
 
 }
+

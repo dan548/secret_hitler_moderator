@@ -12,7 +12,7 @@ enum class Symbols(private val str : String, val description : String) {
     FASC_WIN("\u2600", "Fascists win");
 
 
-    fun getString() : String {
+    override fun toString() : String {
         return str
     }
 }

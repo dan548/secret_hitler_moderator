@@ -1,5 +1,7 @@
 package com.danpolyakov.telegram_bots.secret_hitler_moderator
 
+import me.ivmg.telegram.Bot
+import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -20,6 +22,8 @@ class Game(val chatId : Long, val initiatorId : Long) {
             mapNumberToPlayerId[index + 1] = key
         }
         giveRoles()
+        board = Board(playerList.keys.size, this)
+        board!!.init()
     }
 
     private fun giveRoles() {
@@ -40,6 +44,25 @@ class Game(val chatId : Long, val initiatorId : Long) {
         }
     }
 
-    fun getHitler() : Player = playerList.values.first { player -> player.role == "Hitler" }
-    fun getFascists() : List<Player> = playerList.values.filter { player -> player.role == "fascist" }
+    fun informPlayers(bot : Bot) {
+        val hitler = getHitler()
+        for (player in playerList.values) {
+            bot.sendMessage(player.userId, "Your secret role: ${player.role}\n" +
+                    "Your party membership: ${player.party}")
+        }
+        val list = getFascists()
+        val fascInfo = list.fold(StringBuilder()) { builder, fascist ->
+            builder.append(' ').append(fascist.name)
+        }.toString()
+        for (fascist in list) {
+            bot.sendMessage(fascist.userId, "Fascists are:$fascInfo")
+            bot.sendMessage(fascist.userId, "Hitler is: ${hitler.name}")
+        }
+        if (board!!.playerCount == 5 || board!!.playerCount == 6) {
+            bot.sendMessage(hitler.userId, "Your fascist is:$fascInfo")
+        }
+    }
+
+    private fun getHitler() : Player = playerList.values.first { player -> player.role == "Hitler" }
+    private fun getFascists() : List<Player> = playerList.values.filter { player -> player.role == "fascist" }
 }
