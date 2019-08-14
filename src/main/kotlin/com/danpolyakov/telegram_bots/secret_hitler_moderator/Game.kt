@@ -10,8 +10,9 @@ class Game(val chatId : Long, val initiatorId : Long) {
     private val playerList : MutableList<Player> = ArrayList()
     lateinit var board : Board
     private val mapIdToPlayerNumber : MutableMap<Long, Int> = HashMap()
+    private val mapIdToPlayer : MutableMap<Long, Player> = HashMap()
 
-    fun getPlayerById(id : Long?) : Player? = getPlayerByNumber(getNumberById(id))
+    fun getPlayerById(id : Long?) : Player? = mapIdToPlayer[id]
 
     fun getNumberById(id : Long?) : Int? = id?.let { mapIdToPlayerNumber[it] }
 
@@ -24,6 +25,7 @@ class Game(val chatId : Long, val initiatorId : Long) {
     fun addPlayer(player : Player) {
         if (!playerList.contains(player)) {
             playerList.add(player)
+            mapIdToPlayer.putIfAbsent(player.userId, player)
         }
     }
 
