@@ -7,23 +7,41 @@ import kotlin.collections.HashMap
 
 class Game(val chatId : Long, val initiatorId : Long) {
 
-    val playerList : MutableMap<Long, Player> = HashMap()
-    var board : Board? = null
-    val mapNumberToPlayerId : MutableMap<Int, Long> = HashMap()
+    private val playerList : MutableList<Player> = ArrayList()
+    lateinit var board : Board
+    private val mapIdToPlayerNumber : MutableMap<Long, Int> = HashMap()
 
-    fun addPlayer(userId : Long, player : Player) {
-        playerList.putIfAbsent(userId, player)
+    fun getPlayerById(id : Long?) : Player? = getPlayerByNumber(getNumberById(id))
+
+    fun getNumberById(id : Long?) : Int? = id?.let { mapIdToPlayerNumber[it] }
+
+    private fun getPlayerByNumber(number : Int?) : Player? = number?.let { playerList[it - 1] }
+
+    fun killPlayer(id : Long?) {
+        mapIdToPlayerNumber.remove(id)
+    }
+
+    fun addPlayer(player : Player) {
+        if (!playerList.contains(player)) {
+            playerList.add(player)
+        }
     }
 
     fun start() {
         val random = Random()
-        val keys = playerList.keys.shuffled(random)
-        for ((index, key) in keys.withIndex()) {
-            mapNumberToPlayerId[index + 1] = key
+        playerList.shuffle(random)
+
+        for ((index, player) in playerList.withIndex()) {
+            mapIdToPlayerNumber[player.userId] = index + 1
         }
+
         giveRoles()
-        board = Board(playerList.keys.size, this)
-        board!!.init()
+        board = Board(playerList.size, this)
+        board.init()
+    }
+
+    fun isStarted() : Boolean {
+        return ::board.isInitialized
     }
 
     private fun giveRoles() {
@@ -38,15 +56,14 @@ class Game(val chatId : Long, val initiatorId : Long) {
             roles.add("liberal")
         }
         roles.shuffle()
-        for ((index, role) in roles.withIndex()) {
-            val id = mapNumberToPlayerId[index]
-            playerList[id]!!.role = role
+        for (i in 0 until playersCount) {
+            playerList[i].role = roles[i]
         }
     }
 
     fun informPlayers(bot : Bot) {
         val hitler = getHitler()
-        for (player in playerList.values) {
+        for (player in playerList) {
             bot.sendMessage(player.userId, "Your secret role: ${player.role}\n" +
                     "Your party membership: ${player.party}")
         }
@@ -58,11 +75,23 @@ class Game(val chatId : Long, val initiatorId : Long) {
             bot.sendMessage(fascist.userId, "Fascists are:$fascInfo")
             bot.sendMessage(fascist.userId, "Hitler is: ${hitler.name}")
         }
-        if (board!!.playerCount == 5 || board!!.playerCount == 6) {
+        if (board.playerCount == 5 || board.playerCount == 6) {
             bot.sendMessage(hitler.userId, "Your fascist is:$fascInfo")
         }
     }
 
-    private fun getHitler() : Player = playerList.values.first { player -> player.role == "Hitler" }
-    private fun getFascists() : List<Player> = playerList.values.filter { player -> player.role == "fascist" }
+    fun printRoles() : String {
+        val builder = StringBuilder()
+        if (isStarted()) {
+            for (p in playerList) {
+                builder.append("${p.name}'s secret role was ${p.role}.\n")
+            }
+        }
+        return builder.toString()
+    }
+
+    private fun getHitler() : Player = playerList.first { player -> player.role == "Hitler" }
+    private fun getFascists() : List<Player> = playerList.filter { player -> player.role == "fascist" }
+    fun getAlive() : List<Player> = mapIdToPlayerNumber.values.map { num -> getPlayerByNumber(num)!! }
+    fun state() : State = board.gameState
 }

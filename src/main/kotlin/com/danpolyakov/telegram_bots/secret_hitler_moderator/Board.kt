@@ -1,12 +1,10 @@
 package com.danpolyakov.telegram_bots.secret_hitler_moderator
 
-import java.lang.StringBuilder
-
 class Board(val playerCount : Int, val game : Game) {
     val gameState : State = State(playerCount)
-    private val fascistTrackActions : MutableList<String?> = ArrayList(6)
+    val fascistTrackActions : MutableList<String?> = ArrayList(6)
     var policiesLeft : Int = 17
-    val pile : MutableList<String> = ArrayList()
+    private val pile : MutableList<String> = ArrayList()
 
     fun init() {
         for (i in 1..6) {
@@ -46,7 +44,7 @@ class Board(val playerCount : Int, val game : Game) {
     }
 
     fun print() : String {
-        val builder : StringBuilder = StringBuilder("--- Liberal acts ---\n")
+        val builder = StringBuilder("--- Liberal acts ---\n")
         for (i in 0..4) {
             if (i < gameState.liberalTrack) {
                 builder.append(Symbols.COVERED_FIELD).append(' ')
@@ -82,8 +80,8 @@ class Board(val playerCount : Int, val game : Game) {
             }
         }
         builder.append("\n--- Presidential order ---\n")
-        game.mapNumberToPlayerId.forEach { (number, id) ->
-            builder.append("$number. ${game.playerList[id]!!.name}\n")
+        game.getAlive().forEach { player ->
+            builder.append("${game.getNumberById(player.userId)}. ${player.name}\n")
         }
         builder.append("\nThere are $policiesLeft policies left on the pile.")
         if (gameState.fascistTrack >= 3) {
@@ -91,4 +89,20 @@ class Board(val playerCount : Int, val game : Game) {
         }
         return builder.toString()
     }
+
+    fun getTopPolicy() : String {
+        val policy = pile[pile.size - policiesLeft]
+        policiesLeft--
+        return policy
+    }
+
+    fun enactPolicy(policy : String) {
+        pile.removeAt(pile.indexOf(policy))
+    }
+
+    fun shufflePile() {
+        pile.shuffle()
+        policiesLeft = pile.size
+    }
+
 }
