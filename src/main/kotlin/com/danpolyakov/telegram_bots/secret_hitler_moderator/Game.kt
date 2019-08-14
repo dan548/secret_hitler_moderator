@@ -95,4 +95,5 @@ class Game(val chatId : Long, val initiatorId : Long) {
     private fun getFascists() : List<Player> = playerList.filter { player -> player.role == "fascist" }
     fun getAlive() : List<Player> = mapIdToPlayerNumber.values.map { num -> getPlayerByNumber(num)!! }
     fun state() : State = board.gameState
+    fun getAll() : List<Player> = mapIdToPlayer.values.toList()
 }

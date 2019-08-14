@@ -269,7 +269,7 @@ fun main() {
                             bot.sendMessage(chatId, "A game is already on!!!")
                         } else {
                             if (userStatus == "administrator" || userStatus == "creator" || userId == game.initiatorId) {
-                                if (game.getAlive().size in 5..10) {
+                                if (game.getAll().size in 5..10) {
                                     game.start()
                                     bot.sendMessage(chatId, "The game has started.")
                                     game.informPlayers(bot)
