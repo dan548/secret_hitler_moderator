@@ -9,6 +9,8 @@ import me.ivmg.telegram.bot
 import me.ivmg.telegram.dispatcher.callbackQuery
 import me.ivmg.telegram.entities.CallbackQuery
 import me.ivmg.telegram.entities.InlineKeyboardMarkup
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 fun main() {
 
@@ -294,8 +296,8 @@ fun main() {
                 if (chatId in games.keys) {
                     val userName = update.message!!.from!!.firstName
                     val game = games[chatId]!!
-                    if (game.getAlive().size < 10) {
-                        if (game.getAlive().firstOrNull{player -> player.userId == userId} == null) {
+                    if (game.getAll().size < 10) {
+                        if (game.getAll().firstOrNull{player -> player.userId == userId} == null) {
                             val player = Player(name = userName, userId = userId)
                             val response = bot.sendMessage(userId, "You joined a game in $chatName!").first
                             if (!response!!.isSuccessful) {
@@ -323,7 +325,8 @@ fun main() {
             }
             command("cxc") { bot, update ->
                 val chatId = update.message!!.chat.id
-                bot.sendMessage(chatId = chatId, text = "Саня хуй соси")
+                val list = listOf("Саня", "Слава")
+                bot.sendMessage(chatId = chatId, text = "${list[Random.nextInt(0..1)]} хуй соси")
             }
         }
     }
