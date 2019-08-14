@@ -30,8 +30,7 @@ class Game(val chatId : Long, val initiatorId : Long) {
     }
 
     fun start() {
-        val random = Random()
-        playerList.shuffle(random)
+        playerList.shuffle()
 
         for ((index, player) in playerList.withIndex()) {
             mapIdToPlayerNumber[player.userId] = index + 1
