@@ -242,6 +242,7 @@ fun main() {
                     val userId = update.message!!.from!!.id
                     val status = bot.getChatMember(chatId, userId).first?.body()?.result?.status
                     if (status == "administrator" || status == "creator" || userId == game.initiatorId) {
+                        games.remove(chatId)
                         endGame(bot, game, 99)
                     }
                 } else {
@@ -289,7 +290,8 @@ fun main() {
                     if (game.getAlive().size < 10) {
                         if (game.getAlive().firstOrNull{player -> player.userId == userId} == null) {
                             val player = Player(name = userName, userId = userId)
-                            if (bot.sendMessage(userId, "You joined a game in $chatName!").second != null) {
+                            val response = bot.sendMessage(userId, "You joined a game in $chatName!").first
+                            if (!response!!.isSuccessful) {
                                 bot.sendMessage(chatId, "I can't send you private messages, $userName. Go to @SecretHitlerKotlinBot")
                             } else {
                                 game.addPlayer(player)
@@ -653,9 +655,7 @@ fun endGame(bot : Bot, game : Game, endCode : Int) {
         1 -> bot.sendMessage(game.chatId, "Game over! The liberals win by enacting 5 liberal policies!\n\n${game.printRoles()}")
         2 -> bot.sendMessage(game.chatId, "Game over! The liberals win by killing Hitler!\n\n${game.printRoles()}")
         99 -> {
-            if (game.isStarted()) {
-                bot.sendMessage(game.chatId, "Game cancelled!\n\n${game.printRoles()}")
-            }
+            bot.sendMessage(game.chatId, "Game cancelled!\n\n${game.printRoles()}")
         }
     }
 }
