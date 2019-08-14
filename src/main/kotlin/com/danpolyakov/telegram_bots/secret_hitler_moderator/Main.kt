@@ -7,6 +7,7 @@ import me.ivmg.telegram.entities.InlineKeyboardButton
 import com.natpryce.konfig.*
 import me.ivmg.telegram.bot
 import me.ivmg.telegram.dispatcher.callbackQuery
+import me.ivmg.telegram.dispatcher.text
 import me.ivmg.telegram.entities.CallbackQuery
 import me.ivmg.telegram.entities.InlineKeyboardMarkup
 import kotlin.random.Random
@@ -327,6 +328,14 @@ fun main() {
                 val chatId = update.message!!.chat.id
                 val list = listOf("Саня", "Слава")
                 bot.sendMessage(chatId = chatId, text = "${list[Random.nextInt(0..1)]} хуй соси")
+            }
+            text() { bot, update ->
+                val chatId = update.message!!.chat.id
+                val authorId = update.message!!.from!!.id
+
+                if (games.containsKey(chatId) && games[chatId]!!.isStarted() && !games[chatId]!!.getAliveIds().contains(authorId)) {
+                    bot.deleteMessage(chatId, update.message!!.messageId)
+                }
             }
         }
     }
