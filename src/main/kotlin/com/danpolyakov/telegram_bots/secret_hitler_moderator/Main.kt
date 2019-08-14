@@ -273,6 +273,7 @@ fun main() {
                                     game.start()
                                     bot.sendMessage(chatId, "The game has started.")
                                     game.informPlayers(bot)
+                                    startPreRound(bot, game)
                                 } else {
                                     bot.sendMessage(chatId, "Bad player number.")
                                 }
