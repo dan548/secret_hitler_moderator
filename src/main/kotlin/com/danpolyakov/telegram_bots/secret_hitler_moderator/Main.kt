@@ -22,7 +22,13 @@ fun main() {
 
     val commands = """Доступны следующие команды:
             |/help - Предоставление информации о доступных командах
-            |/start - Показать сообщение и список команд""".trimMargin()
+            |/start - Показать сообщение и список команд
+            |/newgame - Create a new game
+            |/rules - Rules
+            |/cancelgame - Cancel current game
+            |/startgame - Start the game
+            |/join - Join the game
+            |/symbols - board symbols""".trimMargin()
 
     val key = Key("bot.api-key", stringType)
     val config = ConfigurationProperties.fromResource("app.properties")
