@@ -183,6 +183,7 @@ fun main() {
                                     game.state().drawnPolicies.clear()
                                     enactPolicy(bot, game, policyType)
                                 }
+                                unMutePlayers(game)
                             }
                         }
 
@@ -332,8 +333,9 @@ fun main() {
             text() { bot, update ->
                 val chatId = update.message!!.chat.id
                 val authorId = update.message!!.from!!.id
+                val game = games[chatId]
 
-                if (games.containsKey(chatId) && games[chatId]!!.isStarted() && !games[chatId]!!.getAliveIds().contains(authorId)) {
+                if (games.containsKey(chatId) && (game!!.isStarted() && !game.getAliveIds().contains(authorId) || (games.containsKey(chatId) && (game.muted?.toList() ?: ArrayList()).contains(authorId)))) {
                     bot.deleteMessage(chatId, update.message!!.messageId)
                 }
             }
@@ -496,6 +498,7 @@ private fun passTwoPolicies(bot : Bot, game : Game) {
             bot.sendMessage(game.state().chancellor!!.userId,
                 "President ${game.state().president?.name} refused your Veto. Now you have to choose. Which one do you want to enact?",
                 replyMarkup = choosePolicyMarkup)
+            mutePlayers(game, game.state().president!!.userId, game.state().chancellor!!.userId)
         } else {
             if (game.state().fascistTrack < 5) {
                 val choosePolicyMarkup = InlineKeyboardMarkup(btns)
@@ -505,6 +508,14 @@ private fun passTwoPolicies(bot : Bot, game : Game) {
             }
         }
     }
+}
+
+private fun mutePlayers(game : Game, id1 : Long, id2 : Long) {
+    game.muted = Pair(id1, id2)
+}
+
+private fun unMutePlayers(game : Game) {
+    game.muted = null
 }
 
 private fun drawPolicies(bot : Bot, game : Game) {
@@ -519,7 +530,9 @@ private fun drawPolicies(bot : Bot, game : Game) {
         btns.add(listOf(InlineKeyboardButton(policy, "${gameId}_$policy")))
     }
     val choosePolicyMarkup = InlineKeyboardMarkup(btns)
-    bot.sendMessage(game.state().president!!.userId,
+    mutePlayers(game, game.state().president!!.userId, game.state().chancellor!!.userId)
+    bot.sendMessage(
+        game.state().president!!.userId,
         "You drew the following 3 policies. Which one do you want to discard?",
         replyMarkup = choosePolicyMarkup)
 }

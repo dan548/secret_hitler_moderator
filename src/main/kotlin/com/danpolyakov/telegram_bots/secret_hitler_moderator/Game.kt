@@ -11,6 +11,7 @@ class Game(val chatId : Long, val initiatorId : Long) {
     lateinit var board : Board
     private val mapIdToPlayerNumber : MutableMap<Long, Int> = HashMap()
     private val mapIdToPlayer : MutableMap<Long, Player> = HashMap()
+    var muted : Pair<Long, Long>? = null
 
     fun getPlayerById(id : Long?) : Player? = mapIdToPlayer[id]
 
