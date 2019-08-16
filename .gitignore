@@ -2,3 +2,5 @@
 .idea/
 build/
 src/main/resources
+Dockerfile
+app.properties
